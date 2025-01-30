@@ -1,7 +1,7 @@
-const { AnnoyIndex } = require("annoy");
+const { Annoy } = require("annoy");
 
 const dimension = 3; // Example: 3-dimensional vectors
-const annoyIndex = new AnnoyIndex(dimension, "angular");
+const annoyIndex = new Annoy(dimension, "angular");
 
 function addVectorToIndex(id, vector) {
   annoyIndex.addItem(id, vector);
