@@ -1,4 +1,4 @@
-const { addVectorToIndex, buildIndex, getNearestNeighbors } = require("../services/annoyService");
+const { buildIndex, getNearestNeighbors } = require("../services/annoyService");
 const { insertDocument, findDocumentsByIds, findDocuments } = require("../services/mongoService");
 
 const { generateEmbedding } = require("../services/openaiService");
@@ -23,18 +23,19 @@ async function addDocument(req, res) {
 async function buildAnnoyIndex(req, res) {
   try {
     const profiles = await findDocuments("documents");
+    let v = [];
     console.log("Profiles are ", profiles);
 
     profiles.forEach((doc, indexId) => {
       if (doc.descriptionEmbeddings) {
         // Add to Annoy
-        addVectorToIndex(indexId, doc.descriptionEmbeddings);
+        v.push(doc.descriptionEmbeddings);
       } else {
         console.warn(`Document ${indexId} has no descriptionEmbeddings`);
       }
     });
 
-    buildIndex(10); // 10 trees
+    buildIndex(v, 10); // 10 trees
     console.log("Annoy index built successfully");
 
     res.status(200).json({ message: "Annoy index built successfully" });
