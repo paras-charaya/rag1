@@ -26,17 +26,17 @@ async function findDocumentsByIds(collectionName, ids) {
 
   // Convert each id in the `ids` array to ObjectId using `new ObjectId()`
   const objectIds = ids.map(id => new ObjectId(id));
-  console.log("objectIds 123", objectIds)
+  console.log("objectIds 123", objectIds);
 
-  return collection.find({ _id: { $in: objectIds } })
-    .toArray()
-    .then(results => {
-      // Sort results to match the order of objectIds
-      results.sort((a, b) => {
-        return objectIds.indexOf(a._id.toString()) - objectIds.indexOf(b._id.toString());
-      });
-      console.log(results);
-    });
+  // Query the documents by ids
+  const results = await collection.find({ _id: { $in: objectIds } }).toArray();
+
+  // Sort the results to match the order of ids array
+  results.sort((a, b) => {
+    return objectIds.indexOf(a._id.toString()) - objectIds.indexOf(b._id.toString());
+  });
+
+  return results;
 }
 
 async function findDocuments(collectionName) {
