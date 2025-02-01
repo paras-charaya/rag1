@@ -24,16 +24,22 @@ async function buildAnnoyIndex(req, res) {
   try {
     const profiles = await findDocuments("documents");
     let v = [];
-    // console.log("Profiles are ", profiles);
+    let documentIds = [];  // This will store the MongoDB _id values in the same order as vectors
 
     profiles.forEach((doc, indexId) => {
       if (doc.descriptionEmbeddings) {
-        // Add to Annoy
+        // Add vector to Annoy index
         v.push(doc.descriptionEmbeddings);
+        // Store MongoDB _id in the same order as vectors
+        documentIds.push(doc._id.toString()); // Use _id for MongoDB document ID
       } else {
         console.warn(`Document ${indexId} has no descriptionEmbeddings`);
       }
     });
+
+    // Store the mapping somewhere (in memory, or a file, or a database)
+    // You can either store it in memory or in a persistent store. For simplicity, I'll keep it in memory.
+    req.session.documentIds = documentIds;  // Store the documentIds in the session
 
     const data = await buildIndex(v, 10); // 10 trees
     console.log("Annoy index built successfully ", data);
@@ -44,6 +50,7 @@ async function buildAnnoyIndex(req, res) {
     res.status(200).json({ message: "Failed" });
   }
 }
+
 
 async function searchDocuments(req, res) {
   try {
@@ -58,19 +65,26 @@ async function searchDocuments(req, res) {
   
     console.log("neighbors ", neighbors);
   
-    // Retrieve documents from MongoDB
-    if (neighbors) {
-      const results = await findDocumentsByIds("documents", neighbors);
+    // Get the MongoDB _id mapping from the session
+    const documentIds = req.session.documentIds;
+
+    if (documentIds) {
+      // Map the neighbors' indices to the MongoDB _id values
+      const neighborIds = neighbors.map(index => documentIds[index]);
+
+      // Retrieve documents from MongoDB using the mapped _ids
+      const results = await findDocumentsByIds("documents", neighborIds);
+
       res.status(200).json({ neighbors, results });
     } else {
-      res.status(200).json({ neighbors });
+      res.status(404).json({ message: "Document IDs mapping not found!" });
     }
-  } catch(errr) {
+  } catch (errr) {
     console.log("Error 123123123 ", errr);
-    res.status(500).json({  });
+    res.status(500).json({ message: "Server error" });
   }
-
 }
+
 
 
 module.exports = { addDocument, buildAnnoyIndex, health, searchDocuments };

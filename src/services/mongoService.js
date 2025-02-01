@@ -22,7 +22,7 @@ async function insertDocument(collectionName, document) {
 async function findDocumentsByIds(collectionName, ids) {
   const db = await connectToMongo();
   const collection = db.collection(collectionName);
-  return collection.find({ id: { $in: ids } }).toArray();
+  return collection.find({ _id: { $in: ids } }).toArray();
 }
 
 async function findDocuments(collectionName) {
