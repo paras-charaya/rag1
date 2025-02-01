@@ -67,13 +67,15 @@ async function searchDocuments(req, res) {
   
     // Get the MongoDB _id mapping from the session
     const documentIds = req.session.documentIds;
-
+    console.log("documentIds ", documentIds);
     if (documentIds) {
       // Map the neighbors' indices to the MongoDB _id values
       const neighborIds = neighbors.map(index => documentIds[index]);
+      console.log("neighborIds ", neighborIds);
 
       // Retrieve documents from MongoDB using the mapped _ids
       const results = await findDocumentsByIds("documents", neighborIds);
+      console.log("results ", results);
 
       res.status(200).json({ neighbors, results });
     } else {
