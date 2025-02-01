@@ -63,7 +63,15 @@ function getNearestNeighbors(queryVector, n, dims) {
 
     pythonProcess.on("close", (code) => {
       if (code === 0) {
-        resolve(JSON.parse(result.trim()));  // Parse JSON output
+        try {
+          // Parse the result as JSON, trimming any extra whitespace
+          const parsedResult = JSON.parse(result.trim());
+          console.log(`✅ Parsed Neighbors:`, parsedResult);  // Log the parsed result
+          resolve(parsedResult);  // Resolve the Promise with the neighbors
+        } catch (err) {
+          console.error("❌ JSON Parse Error:", err);
+          reject("Invalid JSON from Python");
+        }
       } else {
         reject(`Python process exited with code ${code}`);
       }

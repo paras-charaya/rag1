@@ -54,7 +54,7 @@ async function searchDocuments(req, res) {
     const queryVector = await generateEmbedding(query);
   
     // Get nearest neighbors
-    const { neighbors } = await getNearestNeighbors(queryVector, numNeighbors, dims);
+    const neighbors = await getNearestNeighbors(queryVector, numNeighbors, dims);
   
     console.log("neighbors ", neighbors);
   
