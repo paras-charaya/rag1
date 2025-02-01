@@ -26,6 +26,7 @@ async function findDocumentsByIds(collectionName, ids) {
 
   // Convert each id in the `ids` array to ObjectId using `new ObjectId()`
   const objectIds = ids.map(id => new ObjectId(id));
+  console.log("objectIds 123", objectIds)
 
   return collection.find({ _id: { $in: objectIds } }).toArray();
 }
