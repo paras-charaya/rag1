@@ -18,7 +18,7 @@ function buildIndex(vectors, trees = 10) {
   // console.log("Annoy index built with", trees, "trees");
 
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python', ['annoy_script.py', 'build', JSON.stringify(vectors), dims]);
+    const pythonProcess = spawn('python3', ['annoy_script.py', 'build', JSON.stringify(vectors), dims]);
 
     pythonProcess.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
