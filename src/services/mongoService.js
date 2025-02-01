@@ -1,5 +1,6 @@
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
+const { ObjectId } = require('mongodb');
 
 const mongoClient = new MongoClient("mongodb+srv://parascharaya1997:zB8zs7ObhPtR365P@cluster0.scz0a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
 let db;
@@ -22,7 +23,11 @@ async function insertDocument(collectionName, document) {
 async function findDocumentsByIds(collectionName, ids) {
   const db = await connectToMongo();
   const collection = db.collection(collectionName);
-  return collection.find({ _id: { $in: ids } }).toArray();
+
+  // Convert each id in the `ids` array to ObjectId
+  const objectIds = ids.map(id => ObjectId(id));
+
+  return collection.find({ _id: { $in: objectIds } }).toArray();
 }
 
 async function findDocuments(collectionName) {
