@@ -54,13 +54,17 @@ async function searchDocuments(req, res) {
     const queryVector = await generateEmbedding(query);
   
     // Get nearest neighbors
-    const { neighbors } = getNearestNeighbors(queryVector, numNeighbors, dims);
+    const { neighbors } = await getNearestNeighbors(queryVector, numNeighbors, dims);
   
     console.log("neighbors ", neighbors);
   
     // Retrieve documents from MongoDB
-    const results = await findDocumentsByIds("documents", neighbors);
-    res.status(200).json({ neighbors, results });
+    if (neighbors) {
+      const results = await findDocumentsByIds("documents", neighbors);
+      res.status(200).json({ neighbors, results });
+    } else {
+      res.status(200).json({ neighbors });
+    }
   } catch(errr) {
     console.log("Error 123123123 ", errr);
     res.status(500).json({  });
