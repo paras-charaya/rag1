@@ -52,6 +52,7 @@ function getNearestNeighbors(queryVector, n, dims) {
     let result = "";
 
     pythonProcess.stdout.on("data", (data) => {
+      console.log(` Python Output: ${data.toString()}`);
       result += data.toString();
     });
 
