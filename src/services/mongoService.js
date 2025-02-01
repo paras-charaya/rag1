@@ -24,8 +24,8 @@ async function findDocumentsByIds(collectionName, ids) {
   const db = await connectToMongo();
   const collection = db.collection(collectionName);
 
-  // Convert each id in the `ids` array to ObjectId
-  const objectIds = ids.map(id => ObjectId(id));
+  // Convert each id in the `ids` array to ObjectId using `new ObjectId()`
+  const objectIds = ids.map(id => new ObjectId(id));
 
   return collection.find({ _id: { $in: objectIds } }).toArray();
 }
