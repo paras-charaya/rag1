@@ -28,7 +28,15 @@ async function findDocumentsByIds(collectionName, ids) {
   const objectIds = ids.map(id => new ObjectId(id));
   console.log("objectIds 123", objectIds)
 
-  return collection.find({ _id: { $in: objectIds } }).toArray();
+  return collection.find({ _id: { $in: objectIds } })
+    .toArray()
+    .then(results => {
+      // Sort results to match the order of objectIds
+      results.sort((a, b) => {
+        return objectIds.indexOf(a._id.toString()) - objectIds.indexOf(b._id.toString());
+      });
+      console.log(results);
+    });
 }
 
 async function findDocuments(collectionName) {
