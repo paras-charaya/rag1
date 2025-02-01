@@ -24,7 +24,7 @@ async function buildAnnoyIndex(req, res) {
   try {
     const profiles = await findDocuments("documents");
     let v = [];
-    console.log("Profiles are ", profiles);
+    // console.log("Profiles are ", profiles);
 
     profiles.forEach((doc, indexId) => {
       if (doc.descriptionEmbeddings) {
@@ -46,15 +46,26 @@ async function buildAnnoyIndex(req, res) {
 }
 
 async function searchDocuments(req, res) {
-  const { queryVector, n } = req.body;
+  try {
+    const { query } = req.body;
+    const dims = 1536; // Set the correct number of dimensions
+    const numNeighbors = 5; // Number of nearest neighbors to find
+  
+    const queryVector = await generateEmbedding(query);
+  
+    // Get nearest neighbors
+    const { neighbors } = getNearestNeighbors(queryVector, numNeighbors, dims);
+  
+    console.log("neighbors ", neighbors);
+  
+    // Retrieve documents from MongoDB
+    const results = await findDocumentsByIds("documents", neighbors);
+    res.status(200).json({ neighbors, results });
+  } catch(errr) {
+    console.log("Error 123123123 ", errr);
+    res.status(500).json({  });
+  }
 
-  // Get nearest neighbors
-  const { neighbors } = getNearestNeighbors(queryVector, n);
-
-  // Retrieve documents from MongoDB
-  const results = await findDocumentsByIds("documents", neighbors);
-
-  res.status(200).json({ neighbors, results });
 }
 
 

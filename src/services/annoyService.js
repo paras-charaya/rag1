@@ -18,7 +18,7 @@ function buildIndex(vectors, trees = 10) {
   // console.log("Annoy index built with", trees, "trees");
 
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python3', ['annoy_script.py', 'build', JSON.stringify(vectors), 3]);
+    const pythonProcess = spawn('python3', ['annoy_script.py', 'build', JSON.stringify(vectors), 1536]);
 
     pythonProcess.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
@@ -38,8 +38,36 @@ function buildIndex(vectors, trees = 10) {
   });
 }
 
-function getNearestNeighbors(queryVector, n) {
-  // return annoyIndex.getNNsByVector(queryVector, n, -1, true);
+function getNearestNeighbors(queryVector, n, dims) {
+  return new Promise((resolve, reject) => {
+    const pythonProcess = spawn("python3", [
+      "annoy_script.py",
+      "query",
+      dims.toString(),
+      "index.ann",  // Ensure this is the correct index file path
+      JSON.stringify(queryVector),
+      n.toString(),
+    ]);
+
+    let result = "";
+
+    pythonProcess.stdout.on("data", (data) => {
+      result += data.toString();
+    });
+
+    pythonProcess.stderr.on("data", (data) => {
+      console.error(`Error: ${data}`);
+      reject(data.toString());
+    });
+
+    pythonProcess.on("close", (code) => {
+      if (code === 0) {
+        resolve(JSON.parse(result.trim()));  // Parse JSON output
+      } else {
+        reject(`Python process exited with code ${code}`);
+      }
+    });
+  });
 }
 
 module.exports = {
