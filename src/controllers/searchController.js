@@ -35,8 +35,8 @@ async function buildAnnoyIndex(req, res) {
       }
     });
 
-    buildIndex(v, 10); // 10 trees
-    console.log("Annoy index built successfully");
+    const data = await buildIndex(v, 10); // 10 trees
+    console.log("Annoy index built successfully ", data);
 
     res.status(200).json({ message: "Annoy index built successfully" });
   } catch (err) {
