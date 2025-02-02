@@ -31,12 +31,15 @@ async function findDocumentsByIds(collectionName, ids) {
   // Query the documents by ids
   const results = await collection.find({ _id: { $in: objectIds } }).toArray();
 
-  // Sort the results to match the order of ids array
-  results.sort((a, b) => {
-    return objectIds.indexOf(a._id.toString()) - objectIds.indexOf(b._id.toString());
+  // Create a Map of objectIds to their original index
+  const idToIndexMap = new Map(objectIds.map((id, index) => [id.toString(), index]));
+
+  // Sort the results based on the original order of objectIds
+  const orderedResults = results.sort((a, b) => {
+    return idToIndexMap.get(a._id.toString()) - idToIndexMap.get(b._id.toString());
   });
 
-  return results;
+  return orderedResults;
 }
 
 async function findDocuments(collectionName) {
